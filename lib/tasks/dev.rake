@@ -12,21 +12,24 @@ task sample_data: :environment do
   end
 
 
-  usernames = Array.new { Faker::Name.first_name }
+  # usernames = Array.new { Faker::Name.first_name }
 
-  usernames << "alice"
-  usernames << "bob"
+  
+  users = [] # Array to store created users
 
-   usernames.each do |username|
-     User.create(  email: "#{username}@example.com",
+   ["alice", "bob"].each do |username|
+     user = User.create(  
+     email: "#{username}@example.com",
      password: "password",
      username: username.downcase,
-     private: [true, false].sample,
+     private: [true, false].sample
      )
+
+     users << user if user.persisted?
    end
 
 
-  users = []  # Array to store created users
+    
 
   # Create 12 users with unique names and random privacy settings
   12.times do
@@ -41,7 +44,7 @@ task sample_data: :environment do
     # Add successfully created users to the users array
     users << user if user.persisted?
   end
-
+  
   p "There are now #{User.count} users."
 
   # Generate follow requests between users
