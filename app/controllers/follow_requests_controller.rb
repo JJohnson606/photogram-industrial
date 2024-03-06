@@ -5,7 +5,7 @@ class FollowRequestsController < ApplicationController
   def index
     @follow_requests = FollowRequest.all
   end
-
+ 
   # GET /follow_requests/1 or /follow_requests/1.json
   def show
   end
