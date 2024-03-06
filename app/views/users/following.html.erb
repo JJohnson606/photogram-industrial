@@ -27,6 +27,15 @@
 </div>
 
 
-  <% @user.own_photos.each do |photo| %>
- <%= render "photos/photo", photo: photo %>
+<% @user.leaders.each do |followings| %>
+
+<div class="row mb-4">
+  <div class="col-md-6 offset-md-3">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="card-title"><%= followings.username %></h2>
+      </div>
+    </div>
+  </div>
+</div>
 <% end %>

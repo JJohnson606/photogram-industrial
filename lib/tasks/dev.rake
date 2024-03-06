@@ -1,8 +1,7 @@
 desc "Fill the database tables with some sample data"
-task sample_data: :environment do
+task({ :sample_data => :environment }) do
   p "Creating sample data"
 
-  # Clear existing data and start fresh
   if Rails.env.development?
     FollowRequest.destroy_all
     Comment.destroy_all
@@ -11,40 +10,32 @@ task sample_data: :environment do
     User.destroy_all
   end
 
+  usernames = Array.new { Faker::Name.first_name }
 
-  # usernames = Array.new { Faker::Name.first_name }
+  usernames << "alice"
+  usernames << "bob"
 
-  
-  users = [] # Array to store created users
+  usernames.each do |username|
+    User.create(
+      email: "#{username}@example.com",
+      password: "password",
+      username: username.downcase,
+      private: [true, false].sample,
+    )
+  end
 
-   ["alice", "bob"].each do |username|
-     user = User.create(  
-     email: "#{username}@example.com",
-     password: "password",
-     username: username.downcase,
-     private: [true, false].sample
-     )
-
-     users << user if user.persisted?
-   end
-
-
-    
-
-  # Create 12 users with unique names and random privacy settings
   12.times do
     name = Faker::Name.first_name
-    user = User.create(
+    u = User.create(
       email: "#{name}@example.com",
       password: "password",
-      username: name,
-      private: [true, false].sample  # Randomly assign privacy setting
+      username: name.downcase,
+      private: [true, false].sample,
     )
-
-    # Add successfully created users to the users array
-    users << user if user.persisted?
   end
-  
+
+  users = User.all
+
   p "There are now #{User.count} users."
 
   # Generate follow requests between users
@@ -56,7 +47,7 @@ task sample_data: :environment do
       if rand < 0.75
         first_user.sent_follow_requests.create(
           recipient: second_user,
-          status: FollowRequest.statuses.keys.sample  # Randomly assign status
+          status: FollowRequest.statuses.keys.sample, # Randomly assign status
         )
       end
 
@@ -64,7 +55,7 @@ task sample_data: :environment do
       if rand < 0.75
         second_user.sent_follow_requests.create(
           recipient: first_user,
-          status: FollowRequest.statuses.keys.sample
+          status: FollowRequest.statuses.keys.sample,
         )
       end
     end
@@ -74,10 +65,10 @@ task sample_data: :environment do
 
   # Generate photos, likes, and comments for each user
   users.each do |user|
-    rand(15).times do  # Each user posts between 0 and 15 photos
+    rand(15).times do # Each user posts between 0 and 15 photos
       photo = user.own_photos.create(
         caption: Faker::Quote.jack_handey,  # Use a random quote for caption
-        image: "https://robohash.org/#{rand(9999)}"  # Generate a random image URL
+        image: "https://robohash.org/#{rand(9999)}", # Generate a random image URL
       )
 
       # For each of the user's followers, randomly decide to like the photo or leave a comment
@@ -87,11 +78,11 @@ task sample_data: :environment do
           photo.fans << follower
         end
 
-        # 25% chance for a follower to comment on the photo
-        if rand < 0.25
+        # 50% chance for a follower to comment on the photo
+        if rand < 0.50
           photo.comments.create(
             body: Faker::Quote.jack_handey,  # Use a random quote for comment
-            author: follower
+            author: follower,
           )
         end
       end
