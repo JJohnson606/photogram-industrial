@@ -87,8 +87,8 @@ task sample_data: :environment do
           photo.fans << follower
         end
 
-        # 25% chance for a follower to comment on the photo
-        if rand < 0.25
+        # 75% chance for a follower to comment on the photo
+        if rand < 0.75
           photo.comments.create(
             body: Faker::Quote.jack_handey,  # Use a random quote for comment
             author: follower
